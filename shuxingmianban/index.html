@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script src="static/jquery.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+    <div id="app" >
+      <div id="approot">
+        <el-button v-on:click="domgetter">自选择集添加块</el-button>
+        <el-button v-on:click="showflager">显示/隐藏块自定义属性</el-button>
+        <el-button v-on:click="attrdataclear('all')">清空当前块集合</el-button>
+
+        <el-table
+        :data="attrdata"
+        height="600"
+        empty-text="我的推荐码是N2p37W6">
+        <el-table-column
+        width = 50>       
+          <template slot-scope="scope" >
+            <el-button
+            size = "mini" v-on:click="attrdataclear(scope.row.ID)">
+              -
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="ID"
+          label="ID"
+          key="ID"
+          fit
+          fix>
+        </el-table-column>
+
+        <el-table-column
+          prop="data-type"
+          label="类型"
+          fit>
+        </el-table-column>
+        
+        <el-table-column
+          prop="updated"
+          label="更新时间"
+          fit
+          v-if = "!iscustomattrshow">
+        </el-table-column>
+        
+        <el-table-column
+          label="别名"
+          fit
+          v-if = "!iscustomattrshow">
+          <template slot-scope="scope" >
+            <el-input size="small"  v-model="scope.row.alias" type="textarea">
+            </el-input>
+            <el-button  v-on:click="setters(scope.row,'alias',scope.row.alias)">提交</el-button>  
+          </template>
+        </el-table-column>
+        
+        <el-table-column
+          label="备注"
+          fit
+          v-if = "!iscustomattrshow">
+          <template slot-scope="scope" >
+            <el-input size="small"  v-model="scope.row.memo" type="textarea">
+            </el-input>
+            <el-button  v-on:click="setters(scope.row,'memo',scope.row.memo)">提交</el-button>  
+          </template>
+        </el-table-column>
+        
+        <el-table-column
+          label="自定义属性" style="margin:0%;padding: 0%" v-if = "iscustomattrshow" fit
+          width=600>
+            <template slot-scope="scope"  > 
+              <el-container
+              style = "margin:0%;padding: 0%;">
+                <el-main style = "margin:0%;padding: 0%;" >
+                <el-table
+                :data="scope.row.customattrarry"
+                style="margin:0%;padding: 0%;width: 100%"
+                :show-header= "false">
+                  <el-table-column
+                  label="属性名"
+                  prop="属性名"
+                  width=250
+                  >
+                    <template slot-scope="scope" >
+                      <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
+                      </el-input>
+                    </template>
+                  </el-table-column>
+                <el-table-column
+                label="属性值"
+                prop="属性值"
+                width=250
+                >
+                  <template slot-scope="scope" >
+                    <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                    </el-input>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                prop="ID"
+                v-if="false"
+                >
+                </el-table-column>
+                <el-table-column fit >
+                  <template slot-scope="scope" >
+                  <el-button size="small" v-on:click="customsetters(scope.row.ID,scope.row.属性名,scope.row.属性值)">提交</el-button>
+                  </template>
+                </el-table-column>
+                </el-table>
+                </el-main>
+                <el-footer>
+                  <el-button
+                  style = "width:100%" v-on:click="cusattrappender(scope.row.customattrarry)">
+                    +
+                  </el-button> 
+                </el-footer>
+              </el-container>
+            </template>
+        </el-table-column>
+      </el-table>
+      </div>    
+    </div> 
+</body>
+<script class="vues">
+    var vm = new Vue({
+        el: '#app',
+        mounted: function() {
+        },
+        data() {
+          return {
+            attrdata:[],
+            dominput:[],
+            typetable: {
+              NodeParagraph : "段落块",
+              NodeHeading :"标题块",
+              NodeMathBlock :"数学公式块",
+              NodeCodeBlock : "代码块" ,
+              NodeTable : "表格块",      
+              NodeList : "列表块", 
+              NodeListItem : "列表项块" ,    
+              NodeBlockquote : "引述块",      
+              NodeSuperBlock : "超级块",      
+            },
+            iscustomattrshow : false,
+            }
+        }, 
+        methods: {
+          attrdataclear: function(id){
+            if (id != 'all') {
+            for (i=0;i<this.attrdata.length;i++){
+              let tempobj = this.attrdata[i]
+              if (id == tempobj["ID"]){
+                this.attrdata.splice(i,1)
+              }
+            }
+            }
+            else {              
+              console.log(id)
+              this.attrdata=[]}
+          },
+
+          pusher: function(){
+            console.log(attrdata)
+          },
+          getid: function(id,attr){
+            for (item in attr){
+              item["ID"] = id
+            }
+          },
+          showflager: function(){
+            if (this.iscustomattrshow == false ){this.iscustomattrshow = true}
+            else {this.iscustomattrshow = false}
+            console.log(this.iscustomattrshow)
+          } ,
+          cusattrappender: function(a){
+            let c = a["0"]
+            cuteid = c["ID"] 
+            let b = []
+            b.push({"ID":cuteid,"属性名":"custom-newattr","属性值": "新属性值"})
+            this.differpush(a,b,"属性名")
+            let len = a.length
+            console.log("a",a)
+            let d = a[len-1]["属性名"] 
+            if (d == "custom-newattr"){
+              a[len-1]["属性值"] = "新属性值"
+              console.log("op",a[len-1]["属性值"])
+            }
+            console.log("a1",a)
+            console.log("b",b)
+          },
+          customattrclear: function(id,name){
+            var datas = this.attrdata
+            var currentcusattr = []
+            for (i=0;i<this.attrdata.length;i++){
+              let tempobj = this.attrdata[i]
+              if (id == tempobj["ID"]){
+                currentcusattr=tempobj["customattrarry"]
+              }
+            }
+            console.log(currentcusattr)
+            },
+          currentcusattrgetter: function(id){
+            for (i=0;i<this.attrdata.length;i++){
+              let tempobj = this.attrdata[i]
+              if (id == tempobj["ID"]){
+                currentcusattr=tempobj["customattrarry"]
+              }
+            }
+            console.log("1111",currentcusattr)
+            return (currentcusattr)
+            },
+          
+          customsetters: function(id,属性名,属性值){
+              let attrdata = this.attrdata
+              var datas = ({
+                  })
+              datas["id"] = id
+              datas["attrs"] = {}
+              datas["attrs"][属性名] = 属性值
+              this.attrposter(datas)
+              let currentcusattr = this.currentcusattrgetter(id)
+              console.log(44444,currentcusattr)
+              if (属性值 == "")
+              {
+                if (currentcusattr.length == 1 ){
+                  console.log(789,currentcusattr)
+                  k = [{'ID':id,"属性名":"custom-newattr","属性值": "新属性值"}]
+                  this.differpush(currentcusattr,k,"属性值")
+                  currentcusattr.splice(0,1)
+                  console.log(777,currentcusattr)
+                }
+
+                  else {for (i=0;i<this.attrdata.length;i++){
+                  let tempobj = currentcusattr[i]
+                  if (tempobj["属性名"] == 属性名){
+                    currentcusattr.splice(i,1)}
+                  }
+                }
+                
+              }
+              console.log(5555,currentcusattr)
+            },
+            setters: function(data,ikey,value){
+            id=data["ID"]
+            console.log(data)
+            console.log(id,ikey,value)
+            var datas = ({
+                  })
+            datas["id"] = id
+            datas["attrs"] = {}
+            datas["attrs"][ikey] = value
+            console.log(datas)
+            this.attrposter(datas)
+            },
+          attrposter: function(datas){
+            let jsondatas = JSON.stringify(datas)
+            axios({
+              method:'POST',
+              url:'http://127.0.0.1:6806/api/attr/setBlockAttrs',
+              data:(jsondatas)
+              })
+              let thisid = datas["id"]
+              let attrkey = datas["attrs"]
+              let selector = "div[data-node-id ="+"'"+ thisid+"'"+"]"
+              let blocks = (window.parent.document.querySelector(selector))
+              console.log(blocks)
+              for (attr in attrkey){
+                let tempname = attr
+                let tempvalue = attrkey[attr]
+                console.log(attr)
+                blocks.setAttribute(tempname,tempvalue)
+                console.log("a", blocks.getAttribute(tempname))
+              }
+          },
+          domgetter: function (){
+          this.dominput =[]
+          var nodeSelected1 = Array.from(window.parent.document.querySelectorAll("[class ~= 'protyle-wysiwyg--select']"))
+          var attrarry = []
+          var tempattrsobj = {}
+          nodeSelected1.forEach(element => {
+            tempattrsobj = {}
+            var tempcustomattr = {}
+            var tempcustomattrarry = []
+            Array.from(element.attributes).forEach(attr =>{
+              let tempname = attr.name
+              let tempvalue = attr.value
+              if (tempname == "data-node-id") {tempname = "ID"}
+              if (tempname.slice(0,6) != "custom"){
+              tempattrsobj[tempname] = tempvalue
+              }
+              else {
+                var tempcustomname = attr.name
+                var tempcustomvalue = attr.value
+                tempcustomattr[tempcustomname] =  tempcustomvalue
+                var newcustomattr = tempattrsobj["customattr"]
+                var currentid = tempattrsobj["ID"]
+                console.log("1",currentid)
+                console.log("2",newcustomattr)
+                newcustomattr=(tempcustomattr)
+                tempcustomattrarry.push({"ID":currentid,"属性名":attr.name,"属性值":attr.value})
+                tempattrsobj["customattrarry"] = newcustomattr
+                tempattrsobj["customattrarry"] = tempcustomattrarry
+              }
+              if  (("customattrarry" in tempattrsobj)==false){
+                currentid = tempattrsobj["ID"] 
+                tempattrsobj["customattrarry"] = [{"ID":currentid,"属性名":"custom-newattr","属性值":"新属性值"}]
+                console.log("3",tempattrsobj)
+              }
+            })
+            attrarry.push(tempattrsobj)
+            console.log("4",attrarry)
+          });
+          let typetable1 = this.typetable 
+          attrarry.forEach(el =>{
+            if (el["data-type"] in typetable1){
+              i = el["data-type"]
+              el["data-type"] = typetable1[i]
+            }
+          })
+          this.differpush(this.dominput,attrarry,"ID")
+          this.differpush(this.attrdata,this.dominput,"ID")
+
+
+            console.log("5",this.attrdata)
+          },
+        differpush: function(a,b,flag){
+          for(i in b){
+            var flager1 = true
+            let temp1 = b[i]
+            let flageid = temp1[flag]
+            for(j in a){
+              let tempinput = a
+              let tempobj2 = tempinput[j]
+              if (flageid ==  tempobj2[flag])
+              {flager1 = false}  
+            } 
+            if (flager1){a.push(temp1)}
+            }
+          },
+        },  
+      })
+
+</script>
+<script>    
+</script>
+</html>
