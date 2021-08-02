@@ -11,118 +11,304 @@
 <body>
     <div id="app" >
       <div id="approot">
-        <el-button v-on:click="domgetter">自选择集添加块</el-button>
-        <el-button v-on:click="showflager">显示/隐藏块自定义属性</el-button>
-        <el-button v-on:click="attrdataclear('all')">清空当前块集合</el-button>
+      <el-collapse v-model="activeNames" >
+        <el-collapse-item title="配置数据模式与token" name="1">
+        <el-row>
+          <el-col :span="6">
+          <el-switch  
+          v-model="issqlon"
+          active-text="SQL模式"
+          inactive-text="界面选择模式"
+          active-color="#13ce66"
+          v-on:click="sqlnew"
+          ></el-switch>
+          </el-col>
+          <el-col :span="18">
+          <el-input v-model="apitoken">
+          <template slot="prepend">
+            apitoken
+          </template>
+          <el-button slot="append" v-on:click="apitokensave">
+            保存
+          </el-button>
+        </el-input>
+     ` </el-col>
+        </el-row>
+        </el-collapse-item>
+        <el-collapse-item title="配置表格字段" name="2">
 
+        <el-row>
+        <el-checkbox v-model="isblockidshow" >显示ID</el-checkbox>
+        <el-checkbox v-model="istypeshow" >显示类型</el-checkbox>
+        <el-checkbox v-model="issubtypeshow" >显示子类型</el-checkbox>
+        <el-checkbox v-model="isparentidshow" >显示父ID</el-checkbox>
+        <el-checkbox v-model="isrootidshow" >显示文档ID</el-checkbox>
+        <el-checkbox v-model="isboxshow" >显示笔记本</el-checkbox>
+        <el-checkbox v-model="ispathshow" >显示文档路径</el-checkbox>
+        <el-checkbox v-model="ismarkdownshow" >显示markdown</el-checkbox>
+        <el-checkbox v-model="iscontentshow" >显示纯文本</el-checkbox>
+        <el-checkbox v-model="iscreatedshow" >显示创建时间</el-checkbox>
+        <el-checkbox v-model="isupdatedshow" >显示更新时间</el-checkbox>
+        <el-checkbox v-model="ismemoshow" >显示备注</el-checkbox>
+        <el-checkbox v-model="isnameshow" >显示命名</el-checkbox>
+        <el-checkbox v-model="isaliasshow" >显示别名</el-checkbox>
+        </el-collapse-item>  
+      </el-collapse>
+
+        </el-row>
+        <el-row
+        v-if = "!issqlon">
+        <el-button v-on:click="domdatashower">自选择集添加块</el-button>
+        <el-button v-on:click="attrdataclear('all')">清空当前块集合</el-button>
+        <el-switch  
+        v-model="mergeflag"
+        active-text="增量选择模式"
+        active-color="#13ce66"
+        ></el-switch>
+        </el-row>
+        <el-row
+        v-if = "issqlon">
+          <el-input v-model="sqlstring">sql
+            <template slot="prepend">
+            select * from blocks where
+            </template>
+            <el-button slot="append" icon="el-icon-search" v-on:click="sqlattrsaveget(sqlstring)"></el-button>
+          </el-input>
+        </el-row>
         <el-table
         :data="attrdata"
         height="600"
         empty-text="我的推荐码是N2p37W6">
+
+        <el-table-column>
+
         <el-table-column
-        width = 50>       
+        width = 50
+        v-if = !issqlon>       
           <template slot-scope="scope" >
             <el-button
-            size = "mini" v-on:click="attrdataclear(scope.row.ID)">
+            size = "mini" v-on:click="attrdataclear(scope.row.id)">
               -
             </el-button>
           </template>
         </el-table-column>
+
+        <!-- 此处需要重写自定义属性的获取方法 -->
         <el-table-column
-          prop="ID"
-          label="ID"
-          key="ID"
+        style="margin:0%;padding: 0%" type="expand" >
+        <template slot-scope="scope"  > 
+          <el-container
+          style = "margin:0%;padding: 0%;">
+            <el-main style = "margin:0%;padding: 0%;" >
+            <el-table
+            :data="scope.row.customattrarry"
+            style="margin:0%;padding: 0%;width: 100%"
+            :show-header= "false"
+            empty-text="无自定义属性">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              width=250
+              sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize disabled>
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            width=250
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit >
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'customattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+            <el-table
+            :data="scope.row.tempcustomattrarry"
+            style="margin:0%;padding: 0%;width: 100%"
+            :show-header= "false"
+            empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              width=250
+              sortable>
+              <template slot-scope="scope" >
+                <el-form>
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
+                </el-input>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            width=250
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit >
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'tempcustomattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+          </el-main>
+            <el-footer>
+              <el-button
+              style = "width:30%" v-on:click="cusattrappender(scope.row.id,scope.row.tempcustomattrarry)">
+                添加
+              </el-button> 
+              <el-button
+              style = "width:30%" v-on:click="customsetters(scope.row.id)">
+                确定
+              </el-button> 
+            </el-footer>
+          </el-container>
+        </template>
+        </el-table-column>
+      </el-table-column>
+
+
+        <el-table-column
+          prop="id"
+          label="内容块ID"
           fit
-          fix>
+          fix
+          v-if="isblockidshow"
+          sortable>
         </el-table-column>
 
         <el-table-column
-          prop="data-type"
-          label="类型"
-          fit>
+          prop="type"
+          label="内容块类型"
+          fit
+          v-if="istypeshow"
+          sortable>
         </el-table-column>
-        
+         <el-table-column
+         prop="subtype"
+         label="内容块子类型"
+         fit
+         v-if="issubtypeshow"
+         sortable>
+        </el-table-column>
+        <el-table-column
+          prop="parent_id"
+          label="父块ID"
+          fit
+          v-if="isparentidshow"
+          sortable>
+        </el-table-column>
+        <el-table-column
+          prop="box"
+          label="所在笔记本"
+          fit
+          v-if="isboxshow"
+          sortable>
+        </el-table-column>
+        <el-table-column
+          prop="path"
+          label="所在文档路径"
+          fit
+          v-if="ispathshow"
+          sortable>
+        </el-table-column>
+        <el-table-column
+        prop="root_id"
+        label="所在文档ID"
+        fit
+        v-if="isrootidshow"
+        sortable>
+      </el-table-column>
+        <el-table-column
+          prop="created"
+          label="创建时间"
+          fit
+          v-if="iscreatedshow"
+          sortable>
+        </el-table-column>        
         <el-table-column
           prop="updated"
           label="更新时间"
           fit
-          v-if = "!iscustomattrshow">
+          v-if="isupdatedshow"
+          sortable>
         </el-table-column>
-        
         <el-table-column
+        prop="markdown"
+        label="markdown"
+        fit
+        v-if ="ismarkdownshow"
+        sortable>
+      </el-table-column>
+      <el-table-column
+      prop="content"
+      label="文本"
+      fit
+      v-if ="iscontentshow"
+      sortable>
+    </el-table-column>
+
+
+        <el-table-column
+          prop="name"
+          label="命名"
+          fit
+          v-if ="isnameshow"
+          sortable>
+          <template slot-scope="scope" >
+            <el-input size="small"  v-model="scope.row.name">
+            </el-input>
+            <el-button  v-on:click="setters(scope.row,'name',scope.row.name)">提交</el-button>  
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="alias"
           label="别名"
           fit
-          v-if = "!iscustomattrshow">
+          v-if ="isaliasshow"
+          sortable>
           <template slot-scope="scope" >
             <el-input size="small"  v-model="scope.row.alias" type="textarea">
             </el-input>
             <el-button  v-on:click="setters(scope.row,'alias',scope.row.alias)">提交</el-button>  
           </template>
         </el-table-column>
-        
         <el-table-column
           label="备注"
           fit
-          v-if = "!iscustomattrshow">
+          v-if ="ismemoshow"
+          sortable>
           <template slot-scope="scope" >
             <el-input size="small"  v-model="scope.row.memo" type="textarea">
             </el-input>
             <el-button  v-on:click="setters(scope.row,'memo',scope.row.memo)">提交</el-button>  
           </template>
         </el-table-column>
-        
-        <el-table-column
-          label="自定义属性" style="margin:0%;padding: 0%" v-if = "iscustomattrshow" fit
-          width=600>
-            <template slot-scope="scope"  > 
-              <el-container
-              style = "margin:0%;padding: 0%;">
-                <el-main style = "margin:0%;padding: 0%;" >
-                <el-table
-                :data="scope.row.customattrarry"
-                style="margin:0%;padding: 0%;width: 100%"
-                :show-header= "false">
-                  <el-table-column
-                  label="属性名"
-                  prop="属性名"
-                  width=250
-                  >
-                    <template slot-scope="scope" >
-                      <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
-                      </el-input>
-                    </template>
-                  </el-table-column>
-                <el-table-column
-                label="属性值"
-                prop="属性值"
-                width=250
-                >
-                  <template slot-scope="scope" >
-                    <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
-                    </el-input>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                prop="ID"
-                v-if="false"
-                >
-                </el-table-column>
-                <el-table-column fit >
-                  <template slot-scope="scope" >
-                  <el-button size="small" v-on:click="customsetters(scope.row.ID,scope.row.属性名,scope.row.属性值)">提交</el-button>
-                  </template>
-                </el-table-column>
-                </el-table>
-                </el-main>
-                <el-footer>
-                  <el-button
-                  style = "width:100%" v-on:click="cusattrappender(scope.row.customattrarry)">
-                    +
-                  </el-button> 
-                </el-footer>
-              </el-container>
-            </template>
-        </el-table-column>
+
+      
       </el-table>
       </div>    
     </div> 
@@ -131,31 +317,194 @@
     var vm = new Vue({
         el: '#app',
         mounted: function() {
+          this.selfid = self.frameElement.parentElement.parentElement.getAttribute('data-node-id')
+          this.apitoken = self.frameElement.parentElement.parentElement.getAttribute('custom-apitoken')
+          this.sqlstring = self.frameElement.parentElement.parentElement.getAttribute('custom-sql')
+          console.log(this.selfid)
         },
         data() {
           return {
+            //临时存储返回的自定义属性对象
+            selfid:"",
+            apitoken:"apitoken",
+            tempcusattr: {},
+            isblockidshow:true,
+            istypeshow:true,
+            issubtypeshow:false,
+            isparentidshow:false,
+            isboxshow:false,
+            ispathshow:false,
+            isrootidshow:false,
+            iscrshow:false,
+            isupdatedshow:false,
+            ismarkdownshow:false,
+            isbaseattrshow:false,
+            isaliasshow:false,
+            ismemoshow:false,
+            iscreatedshow:false,
+            isnameshow:false,
+            iscontentshow:false,
+            activeNames:1,
+            //是否为sql选择模式
+            issqlon : false,
+            //是否为增量选择模式
+            mergeflag : false,
+            //临时存储sql来源的数据
+            sqltemp :[],
+            //存储sql来源的数据
+            sqldata :[],
+            //存储sql来源的属性
+            sqlattr :[],
+            //存储sql筛选条件，默认值为筛选块所在笔记//
+            sqlstring: "id='20210731093633-ng0ismu' or id ='20210730113821-dybssx2'",
+            //汇总显示属性值
             attrdata:[],
+            //储存dom来源的数据（需要重构为sql来源数据相同格式）
             dominput:[],
-            typetable: {
-              NodeParagraph : "段落块",
+            //储存dom来源的数据id（用于写入到挂件块本身来持久化选择集）
+            dominputid:[],
+            //储存dom类型字段与块中文名的映射
+            domtypetable: {
               NodeHeading :"标题块",
               NodeMathBlock :"数学公式块",
               NodeCodeBlock : "代码块" ,
-              NodeTable : "表格块",      
               NodeList : "列表块", 
               NodeListItem : "列表项块" ,    
+              NodeTable : "表格块",      
               NodeBlockquote : "引述块",      
-              NodeSuperBlock : "超级块",      
+              NodeSuperBlock : "超级块", 
+              NodeParagraph : "段落块",     
             },
+            ///储存blocks表type字段与块中文名的映射
+            blocktypetable:{
+              d :"文档块",
+              h :"标题块",
+              l :"列表块",
+              i :"列表项块",
+              c :"代码块",
+              m :"数学公式块",
+              t :"表格块",
+              b :"引述块",
+              s :"超级块",
+              p :"段落块", 
+            },
+                        //储存是否显示自定义属性
+
+            blocklabeltable:{
+              id: "内容块ID" ,
+              parent_id: "父块ID",
+              previous_id: "前块的 ID",
+              next_id: "后块的 ID",
+              root_id: "根块 ID",
+              box: "笔记本名",
+              path: "内容块所在文档路径",
+              name: "内容块名称",
+              alias: "内容块 别名",
+              memo: "内容块备注",
+              content: "去除了 Markdown 标记符的文本",
+              markdown: "包含完整 Markdown 标记符的文本",
+              length: "Markdown 文本长度",
+              type: "类型",
+              subtype: "子类型 ",
+              ial:"内联属性列表",
+              sort: "排序用，数值越小排序越靠前",
+              created: "创建时间",
+              updated: "更新时间",
+            },
+            //储存是否显示自定义属性
             iscustomattrshow : false,
             }
         }, 
         methods: {
+          sqlnew: function(){
+            this.sqlstring = self.frameElement.parentElement.parentElement.getAttribute('custom-sql')
+          },
+          //用于以字符串规则提取块数据和块属性
+          apitokensave: function(){
+            this.selfid = self.frameElement.parentElement.parentElement.getAttribute('data-node-id')
+            let datas = {}
+            datas["id"] = this.selfid
+            datas["attrs"] = {}
+            datas["attrs"]["custom-apitoken"]= this.apitoken
+            this.attrposter(datas)
+          },
+          sqlcusgetter: async function(id){
+            let jsondatas = {"id" : id}
+            this.tempcusattr = []
+            await axios({
+              method:'POST',
+              url:'http://127.0.0.1:6806/api/attr/getBlockAttrs',
+              headers:{'Authorization': 'Token' + this.apitoken},
+              data:(jsondatas)
+              }).then(result =>{
+              this.tempcusattr = result.data["data"]
+              console.log("getterresult",result);
+              console.log("dataitem",this.tempcusattr);
+              })
+            return this.tempcusattr
+          },
+          cusattrrefactor:async function(tempid){
+            let tempcusattr = await  this.sqlcusgetter(tempid)
+            let tempattrarry = []
+            for(属性名 in tempcusattr){
+              if (属性名.slice(0,6)=="custom"){
+              let 属性值 = tempcusattr[属性名]
+              属性名 = 属性名.slice(7)
+              let id = tempid
+              let tmpobj = {id,属性名,属性值}
+              tempattrarry.push(tmpobj)}
+            }
+            console.log("attr",tempattrarry)
+            return tempattrarry
+          },
+          //目前需要增加块属性的提取
+          sqlattrgetter: async function(rawstring){
+            finalstring =  "select * from blocks where " + rawstring
+            let datas = {"stmt": finalstring} 
+            console.log("sql",finalstring)
+            let jsondatas = JSON.stringify(datas)
+            let sqltemp = {} 
+            await axios({
+              method:'POST',
+              url:'http://127.0.0.1:6806/api/query/sql',
+              headers:{'Authorization': 'Token' + this.apitoken},
+              data:(jsondatas)
+              }).then(result =>{
+              let sqldataitem = result.data["data"]
+              sqltemp = sqldataitem 
+              })
+              console.log("resultdata",sqltemp)
+              let tempattrdata = sqltemp
+              for(i=0;i<tempattrdata.length;i++){
+                let tempblockitem =  tempattrdata[i]
+                let tempid = tempblockitem['id']
+                tempblockitem['customattrarry'] = await this.cusattrrefactor(tempid)
+                tempblockitem['tempcustomattrarry'] = []
+                console.log(tempblockitem) 
+              }
+              console.log(tempattrdata)
+              if(this.issqlon){
+                this.attrdata = sqltemp
+              }
+
+              console.log("sqltemp",sqltemp)
+              return sqltemp
+            },
+          sqlattrsaveget: function(rawstring){
+            let datas1 = {}
+            datas1["id"] = this.selfid
+            datas1["attrs"] = {}
+            datas1["attrs"] = {"custom-sql":rawstring}
+            this.attrposter(datas1)
+            this.sqlattrgetter(rawstring)
+          },
+          //根据id来清理块集合，sql模式下不可用，参数为all时全部清空。
           attrdataclear: function(id){
+            console.log(id)
             if (id != 'all') {
             for (i=0;i<this.attrdata.length;i++){
               let tempobj = this.attrdata[i]
-              if (id == tempobj["ID"]){
+              if (id == tempobj["id"]){
                 this.attrdata.splice(i,1)
               }
             }
@@ -164,90 +513,80 @@
               console.log(id)
               this.attrdata=[]}
           },
-
-          pusher: function(){
-            console.log(attrdata)
-          },
           getid: function(id,attr){
             for (item in attr){
-              item["ID"] = id
+              item["id"] = id
             }
           },
-          showflager: function(){
-            if (this.iscustomattrshow == false ){this.iscustomattrshow = true}
-            else {this.iscustomattrshow = false}
-            console.log(this.iscustomattrshow)
-          } ,
-          cusattrappender: function(a){
-            let c = a["0"]
-            cuteid = c["ID"] 
-            let b = []
-            b.push({"ID":cuteid,"属性名":"custom-newattr","属性值": "新属性值"})
-            this.differpush(a,b,"属性名")
-            let len = a.length
-            console.log("a",a)
-            let d = a[len-1]["属性名"] 
-            if (d == "custom-newattr"){
-              a[len-1]["属性值"] = "新属性值"
-              console.log("op",a[len-1]["属性值"])
-            }
-            console.log("a1",a)
-            console.log("b",b)
+          cusattrappender: function(id,data){
+            cuteid = id
+            data.push({"id":cuteid,"属性名":"","属性值": ""})
           },
-          customattrclear: function(id,name){
-            var datas = this.attrdata
-            var currentcusattr = []
+          currentattrgetter: function(id,name){
             for (i=0;i<this.attrdata.length;i++){
               let tempobj = this.attrdata[i]
-              if (id == tempobj["ID"]){
-                currentcusattr=tempobj["customattrarry"]
-              }
-            }
-            console.log(currentcusattr)
-            },
-          currentcusattrgetter: function(id){
-            for (i=0;i<this.attrdata.length;i++){
-              let tempobj = this.attrdata[i]
-              if (id == tempobj["ID"]){
-                currentcusattr=tempobj["customattrarry"]
+              if (id == tempobj["id"]){
+                currentcusattr=tempobj[name]
               }
             }
             console.log("1111",currentcusattr)
             return (currentcusattr)
             },
-          
-          customsetters: function(id,属性名,属性值){
-              let attrdata = this.attrdata
-              var datas = ({
+          customdeleter:async function(id,属性名,dataname){
+            let attrdata = this.attrdata
+              let datas = ({
                   })
               datas["id"] = id
               datas["attrs"] = {}
-              datas["attrs"][属性名] = 属性值
-              this.attrposter(datas)
-              let currentcusattr = this.currentcusattrgetter(id)
-              console.log(44444,currentcusattr)
-              if (属性值 == "")
-              {
-                if (currentcusattr.length == 1 ){
-                  console.log(789,currentcusattr)
-                  k = [{'ID':id,"属性名":"custom-newattr","属性值": "新属性值"}]
-                  this.differpush(currentcusattr,k,"属性值")
-                  currentcusattr.splice(0,1)
-                  console.log(777,currentcusattr)
+              datas["attrs"]["custom-"+属性名] = ""
+              await this.attrposter(datas)
+              let currentcusattr = this.currentattrgetter(id,dataname)
+              for (i=0;i<currentcusattr.length;i++){
+                if (currentcusattr[i]["属性名"] == 属性名){
+                  currentcusattr.splice(i,1)
                 }
-
-                  else {for (i=0;i<this.attrdata.length;i++){
-                  let tempobj = currentcusattr[i]
-                  if (tempobj["属性名"] == 属性名){
-                    currentcusattr.splice(i,1)}
-                  }
-                }
-                
               }
-              console.log(5555,currentcusattr)
+          },
+          customsetters:async function(id){
+              let currentcusattr = this.currentattrgetter(id,'customattrarry')
+              let currenttempcusattr = this.currentattrgetter(id,"tempcustomattrarry")
+              this.differpush(currentcusattr,currenttempcusattr,"属性名")
+              for (i=0;i<currentcusattr.length;i++){
+                if (currentcusattr[i]["属性名"]=="") {
+                  currentcusattr.splice(i,1)
+                }
+              }
+              await this.customqueryposter(id,currentcusattr)
+              for (i=0;i<currentcusattr.length;i++){
+                if (currentcusattr[i]["属性值"]=="") {
+                  currentcusattr.splice(i,1)
+                }
+              }
+              for (i=0;i<=currenttempcusattr.length;++i){
+                currenttempcusattr.splice(i,1)
+                currenttempcusattr.splice(0,1)
+                console.log(currenttempcusattr)
+              }
+
+              console.log(currentcusattr)
             },
-            setters: function(data,ikey,value){
-            id=data["ID"]
+          customqueryposter:async function(id,data){
+            let postdatas = ({
+                  })
+            postdatas["id"] = id
+            postdatas["attrs"] = {}
+            for (i=0;i<data.length;i++){
+                let tempattr = data[i]
+                let tempname = "custom-"+tempattr["属性名"]
+                let tempvalue = tempattr["属性值"]
+                postdatas["attrs"][tempname] = tempvalue
+              }
+              console.log("cusset",postdatas)
+            await this.attrposter(postdatas)
+          },
+
+          setters: function(data,ikey,value){
+            id=data["id"]
             console.log(data)
             console.log(id,ikey,value)
             var datas = ({
@@ -260,87 +599,68 @@
             },
           attrposter: function(datas){
             let jsondatas = JSON.stringify(datas)
+            console.log(datas)
             axios({
               method:'POST',
+              headers:{'Authorization': 'Token' + this.apitoken},
               url:'http://127.0.0.1:6806/api/attr/setBlockAttrs',
               data:(jsondatas)
               })
-              let thisid = datas["id"]
-              let attrkey = datas["attrs"]
-              let selector = "div[data-node-id ="+"'"+ thisid+"'"+"]"
-              let blocks = (window.parent.document.querySelector(selector))
-              console.log(blocks)
-              for (attr in attrkey){
-                let tempname = attr
-                let tempvalue = attrkey[attr]
-                console.log(attr)
-                blocks.setAttribute(tempname,tempvalue)
-                console.log("a", blocks.getAttribute(tempname))
-              }
           },
-          domgetter: function (){
-          this.dominput =[]
+          domidgetter:  function (a){
+          this.dominputid =[]
           var nodeSelected1 = Array.from(window.parent.document.querySelectorAll("[class ~= 'protyle-wysiwyg--select']"))
           var attrarry = []
           var tempattrsobj = {}
-          nodeSelected1.forEach(element => {
-            tempattrsobj = {}
+          nodeSelected1.forEach(element=>{
             var tempcustomattr = {}
             var tempcustomattrarry = []
             Array.from(element.attributes).forEach(attr =>{
               let tempname = attr.name
               let tempvalue = attr.value
-              if (tempname == "data-node-id") {tempname = "ID"}
-              if (tempname.slice(0,6) != "custom"){
-              tempattrsobj[tempname] = tempvalue
-              }
-              else {
-                var tempcustomname = attr.name
-                var tempcustomvalue = attr.value
-                tempcustomattr[tempcustomname] =  tempcustomvalue
-                var newcustomattr = tempattrsobj["customattr"]
-                var currentid = tempattrsobj["ID"]
-                console.log("1",currentid)
-                console.log("2",newcustomattr)
-                newcustomattr=(tempcustomattr)
-                tempcustomattrarry.push({"ID":currentid,"属性名":attr.name,"属性值":attr.value})
-                tempattrsobj["customattrarry"] = newcustomattr
-                tempattrsobj["customattrarry"] = tempcustomattrarry
-              }
-              if  (("customattrarry" in tempattrsobj)==false){
-                currentid = tempattrsobj["ID"] 
-                tempattrsobj["customattrarry"] = [{"ID":currentid,"属性名":"custom-newattr","属性值":"新属性值"}]
-                console.log("3",tempattrsobj)
-              }
+              if  (tempname == "data-node-id") 
+              {this.dominputid.push(tempvalue)}
             })
-            attrarry.push(tempattrsobj)
-            console.log("4",attrarry)
-          });
-          let typetable1 = this.typetable 
-          attrarry.forEach(el =>{
-            if (el["data-type"] in typetable1){
-              i = el["data-type"]
-              el["data-type"] = typetable1[i]
-            }
           })
-          this.differpush(this.dominput,attrarry,"ID")
-          this.differpush(this.attrdata,this.dominput,"ID")
-
-
-            console.log("5",this.attrdata)
+          console.log(this.dominputid)
+          },
+          domdatashower:async function (){
+            this.domidgetter()
+            let temitemquery = []
+            console.log(this.dominputid)
+            let domidtoselector = "id =" + "\""+this.selfid+"\""
+            this.dominputid.forEach(id=>
+            {
+              domidtoselector =domidtoselector + " or "+ "id =" + '"'+id+'"'
+            })
+            temitemquery = await this.sqlattrgetter(domidtoselector)
+            console.log("temp",temitemquery)
+            let flag = this.mergeflag
+            if (flag == false){
+            this.attrdata = temitemquery}
+            else{this.differpush(this.attrdata,temitemquery,"id")
+            }
           },
         differpush: function(a,b,flag){
+          let realflag = flag
+          if (a==[{}]){
+            for(i=0;i<b.length;i++){
+              a.push(b[i])
+            }
+          }
           for(i in b){
             var flager1 = true
             let temp1 = b[i]
-            let flageid = temp1[flag]
+            let flagvalue = temp1[realflag]
             for(j in a){
               let tempinput = a
               let tempobj2 = tempinput[j]
-              if (flageid ==  tempobj2[flag])
+              if (flagvalue ==  tempobj2[realflag])
               {flager1 = false}  
             } 
-            if (flager1){a.push(temp1)}
+            if (flager1){
+              a.push(temp1)
+            }
             }
           },
         },  
