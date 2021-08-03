@@ -122,13 +122,11 @@
           <el-container
           style = "margin:0%;padding: 0%;">
             <el-main style = "margin:0%;padding: 0%;" >
-            <el-row>
             <el-table
             :data="scope.row.customattrarry"
-            style="margin:0%;padding: 0%;"
-            empty-text="无自定义属性"
+            style="margin:0%;padding: 0%;width: 100%"
             :show-header= "false"
-            >
+            empty-text="无自定义属性">
             <el-table-column
               label="属性名"
               prop="属性名"
@@ -158,11 +156,9 @@
               </template>
             </el-table-column>
             </el-table>
-            <el-row>
-            <el-row>
             <el-table
             :data="scope.row.tempcustomattrarry"
-            style="margin:0%;padding: 0%"
+            style="margin:0%;padding: 0%;width: 100%"
             :show-header= "false"
             empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
             <el-table-column
@@ -196,7 +192,6 @@
               </template>
             </el-table-column>
             </el-table>
-          </el-row>
           </el-main>
             <el-footer>
               <el-button
