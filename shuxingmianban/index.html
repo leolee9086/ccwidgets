@@ -11,52 +11,34 @@
 <body>
     <div id="app" >
       <div id="approot">
-      <!--这里是配置抽屉-->
-      <el-drawer
-      title="配置"
-      :visible.sync="drawer"
-      size='180px'>
       <el-collapse v-model="activeNames" >
-        <el-collapse-item title="apitoken" name="1">
-          <el-row>
-            <el-col>
-              <el-input  v-model="apitoken" >
-              </el-input>
-            </el-col>
-            <el-col>
-            <el-button size=small  v-on:click="apitokensave">
-            保存
-            </el-button>
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-        <el-collapse-item title="表格字段" name="2">
-        
-        <el-row><el-button v-on:click="configsaver">保存配置</el-button></el-row>
-        <el-row><el-button v-on:click="configgetter">获取配置</el-button></el-row>
+        <el-collapse-item title="配置数据模式与token" name="1">
         <el-row>
-          <el-row><el-checkbox v-model="config.isblockidshow" >显示ID</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.istypeshow" >显示类型</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.issubtypeshow" >显示子类型</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.isparentidshow" >显示父ID</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.isrootidshow" >显示文档ID</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.isboxshow" >显示笔记本</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.ispathshow" >显示文档路径</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.ismarkdownshow" >显示markdown</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.iscontentshow" >显示纯文本</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.iscreatedshow" >显示创建时间</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.isupdatedshow" >显示更新时间</el-checkbox></el-row>
-          <el-row><el-checkbox v-model="config.ismemoshow" >显示备注</el-checkbox></el-row>         
-          <el-row><el-checkbox v-model="config.isnameshow" >显示命名</el-checkbox></el-row>          
-          <el-row><el-checkbox v-model="config.isaliasshow" >显示别名</el-checkbox></el-row>        
+          <el-col :span="6">
+          <el-switch  
+          v-model="issqlon"
+          active-text="SQL模式"
+          inactive-text="界面选择模式"
+          active-color="#13ce66"
+          v-on:click="sqlnew"
+          ></el-switch>
+          </el-col>
+          <el-col :span="18">
+          <el-input v-model="apitoken">
+          <template slot="prepend">
+            apitoken
+          </template>
+          <el-button slot="append" v-on:click="apitokensave">
+            保存
+          </el-button>
+        </el-input>
+     ` </el-col>
         </el-row>
         </el-collapse-item>
-        </el-collapse>       
-        </el-drawer>
-
-
+        <el-collapse-item title="配置表格字段" name="2">
 
         <el-row>
+<<<<<<< HEAD
           <el-col>
             <el-switch  
             v-model="issqlon"
@@ -102,7 +84,45 @@
             </el-row>
           </el-col>
         </el-row>
+=======
+        <el-checkbox v-model="isblockidshow" >显示ID</el-checkbox>
+        <el-checkbox v-model="istypeshow" >显示类型</el-checkbox>
+        <el-checkbox v-model="issubtypeshow" >显示子类型</el-checkbox>
+        <el-checkbox v-model="isparentidshow" >显示父ID</el-checkbox>
+        <el-checkbox v-model="isrootidshow" >显示文档ID</el-checkbox>
+        <el-checkbox v-model="isboxshow" >显示笔记本</el-checkbox>
+        <el-checkbox v-model="ispathshow" >显示文档路径</el-checkbox>
+        <el-checkbox v-model="ismarkdownshow" >显示markdown</el-checkbox>
+        <el-checkbox v-model="iscontentshow" >显示纯文本</el-checkbox>
+        <el-checkbox v-model="iscreatedshow" >显示创建时间</el-checkbox>
+        <el-checkbox v-model="isupdatedshow" >显示更新时间</el-checkbox>
+        <el-checkbox v-model="ismemoshow" >显示备注</el-checkbox>
+        <el-checkbox v-model="isnameshow" >显示命名</el-checkbox>
+        <el-checkbox v-model="isaliasshow" >显示别名</el-checkbox>
+        </el-collapse-item>  
+      </el-collapse>
+>>>>>>> parent of 707824c (改变界面，支持保存sql，支持保存表格字段配置)
 
+        </el-row>
+        <el-row
+        v-if = "!issqlon">
+        <el-button v-on:click="domdatashower">自选择集添加块</el-button>
+        <el-button v-on:click="attrdataclear('all')">清空当前块集合</el-button>
+        <el-switch  
+        v-model="mergeflag"
+        active-text="增量选择模式"
+        active-color="#13ce66"
+        ></el-switch>
+        </el-row>
+        <el-row
+        v-if = "issqlon">
+          <el-input v-model="sqlstring">sql
+            <template slot="prepend">
+            select * from blocks where
+            </template>
+            <el-button slot="append" icon="el-icon-search" v-on:click="sqlattrsaveget(sqlstring)"></el-button>
+          </el-input>
+        </el-row>
         <el-table
         :data="attrdata"
         height="600"
@@ -129,7 +149,7 @@
           label="内容块ID"
           fit
           fix
-          v-if="config.isblockidshow"
+          v-if="isblockidshow"
           sortable>
         </el-table-column>
 
@@ -137,70 +157,70 @@
           prop="type"
           label="内容块类型"
           fit
-          v-if="config.istypeshow"
+          v-if="istypeshow"
           sortable>
         </el-table-column>
          <el-table-column
          prop="subtype"
          label="内容块子类型"
          fit
-         v-if="config.issubtypeshow"
+         v-if="issubtypeshow"
          sortable>
         </el-table-column>
         <el-table-column
           prop="parent_id"
           label="父块ID"
           fit
-          v-if="config.isparentidshow"
+          v-if="isparentidshow"
           sortable>
         </el-table-column>
         <el-table-column
           prop="box"
           label="所在笔记本"
           fit
-          v-if="config.isboxshow"
+          v-if="isboxshow"
           sortable>
         </el-table-column>
         <el-table-column
           prop="path"
           label="所在文档路径"
           fit
-          v-if="config.ispathshow"
+          v-if="ispathshow"
           sortable>
         </el-table-column>
         <el-table-column
         prop="root_id"
         label="所在文档ID"
         fit
-        v-if="config.isrootidshow"
+        v-if="isrootidshow"
         sortable>
       </el-table-column>
         <el-table-column
           prop="created"
           label="创建时间"
           fit
-          v-if="config.iscreatedshow"
+          v-if="iscreatedshow"
           sortable>
         </el-table-column>        
         <el-table-column
           prop="updated"
           label="更新时间"
           fit
-          v-if="config.isupdatedshow"
+          v-if="isupdatedshow"
           sortable>
         </el-table-column>
         <el-table-column
         prop="markdown"
         label="markdown"
         fit
-        v-if ="config.ismarkdownshow"
+        v-if ="ismarkdownshow"
         sortable>
       </el-table-column>
       <el-table-column
       prop="content"
       label="文本"
       fit
-      v-if ="config.iscontentshow"
+      v-if ="iscontentshow"
       sortable>
     </el-table-column>
 
@@ -209,7 +229,7 @@
           prop="name"
           label="命名"
           fit
-          v-if ="config.isnameshow"
+          v-if ="isnameshow"
           sortable>
           <template slot-scope="scope" >
             <el-input size="small"  v-model="scope.row.name">
@@ -221,7 +241,7 @@
           prop="alias"
           label="别名"
           fit
-          v-if ="config.isaliasshow"
+          v-if ="isaliasshow"
           sortable>
           <template slot-scope="scope" >
             <el-input size="small"  v-model="scope.row.alias" type="textarea">
@@ -232,7 +252,7 @@
         <el-table-column
           label="备注"
           fit
-          v-if ="config.ismemoshow"
+          v-if ="ismemoshow"
           sortable>
           <template slot-scope="scope" >
             <el-input size="small"  v-model="scope.row.memo" type="textarea">
@@ -435,17 +455,13 @@
           this.apitoken = self.frameElement.parentElement.parentElement.getAttribute('custom-apitoken')
           this.sqlstring = self.frameElement.parentElement.parentElement.getAttribute('custom-sql')
           console.log(this.selfid)
-          console.log(this.sqlstring)
-          console.log(this.apitoken)
         },
         data() {
           return {
-            drawer:false,
             //临时存储返回的自定义属性对象
             selfid:"",
             apitoken:"apitoken",
             tempcusattr: {},
-            config:{
             isblockidshow:true,
             istypeshow:true,
             issubtypeshow:false,
@@ -462,7 +478,6 @@
             iscreatedshow:false,
             isnameshow:false,
             iscontentshow:false,
-            },
             activeNames:1,
             //是否为sql选择模式
             issqlon : false,
@@ -478,6 +493,8 @@
             sqlstring: "id='20210731093633-ng0ismu' or id ='20210730113821-dybssx2'",
             //汇总显示属性值
             attrdata:[],
+            //储存dom来源的数据（需要重构为sql来源数据相同格式）
+            dominput:[],
             //储存dom来源的数据id（用于写入到挂件块本身来持久化选择集）
             dominputid:[],
             //储存dom类型字段与块中文名的映射
@@ -533,37 +550,8 @@
             }
         }, 
         methods: {
-          idquerysaver:async function(){
-            let idquery = this.dominputid
-            let idqueryobj ={}
-            for (i=0;i<idquery.length;i++){
-              idqueryobj["id"+i] = idquery[i]
-            }
-            let datas = {}
-            datas["id"] = this.selfid
-            datas["attrs"] = {}
-            datas["attrs"]["custom-idquery"]= JSON.stringify(idqueryobj)
-            await this.attrposter(datas)
-            console.log(idquery,idqueryobj)
-          },        
-          configgetter:async function(){
-            cusattr = await this.sqlcusgetter(this.selfid)
-            tempconfig = cusattr["custom-config"]
-            console.log("configget",tempconfig)
-            this.config = JSON.parse(tempconfig)
-          },
-          configsaver:async function(){
-            let datas = {}
-            datas["id"] = this.selfid
-            datas["attrs"] = {}
-            datas["attrs"]["custom-config"]= JSON.stringify(this.config)
-            await this.attrposter(datas)
-          },
-          sqlnew:async function(){
-            cusattr = await this.sqlcusgetter(this.selfid)
-            temp = cusattr["custom-sql"]
-            console.log("custom-sql",temp)
-            this.sqlstring = temp
+          sqlnew: function(){
+            this.sqlstring = self.frameElement.parentElement.parentElement.getAttribute('custom-sql')
           },
           //用于以字符串规则提取块数据和块属性
           apitokensave: function(){
@@ -636,13 +624,13 @@
               console.log("sqltemp",sqltemp)
               return sqltemp
             },
-          sqlattrsave: function(rawstring){
-            this.selfid = self.frameElement.parentElement.parentElement.getAttribute('data-node-id')
+          sqlattrsaveget: function(rawstring){
             let datas1 = {}
             datas1["id"] = this.selfid
             datas1["attrs"] = {}
             datas1["attrs"] = {"custom-sql":rawstring}
             this.attrposter(datas1)
+            this.sqlattrgetter(rawstring)
           },
           //根据id来清理块集合，sql模式下不可用，参数为all时全部清空。
           attrdataclear: function(id){
@@ -754,10 +742,7 @@
               })
           },
           domidgetter:  function (a){
-          let flag = this.mergeflag
-          if (flag == false){
-            this.dominputid =[]
-          }
+          this.dominputid =[]
           var nodeSelected1 = Array.from(window.parent.document.querySelectorAll("[class ~= 'protyle-wysiwyg--select']"))
           var attrarry = []
           var tempattrsobj = {}
@@ -773,45 +758,22 @@
           })
           console.log(this.dominputid)
           },
-          idquerydatashower:async function(){
-            let cusattr = await this.sqlcusgetter(this.selfid)
-            let tempobjstring = cusattr["custom-idquery"]
-            let tempobj = JSON.parse(tempobjstring)
-            console.log(tempobj)
-            let tempquery = Object.values(tempobj) 
-            console.log(tempquery)
-            this.dominputid = tempquery
-            console.log(this.dominputid)
-            let domidtoselector = ""
-            this.dominputid.forEach(id=>
-            {
-              domidtoselector =domidtoselector + "id =" + '"'+id+'"'+" or "
-            })
-            domidtoselector = domidtoselector.substring(0,domidtoselector.length - 3)
-            console.log(domidtoselector)
-            temitemquery = await this.sqlattrgetter(domidtoselector)
-            console.log("temp",temitemquery)
-            this.attrdata = temitemquery
-          },
           domdatashower:async function (){
             this.domidgetter()
             let temitemquery = []
             console.log(this.dominputid)
-            let domidtoselector = ""
+            let domidtoselector = "id =" + "\""+this.selfid+"\""
             this.dominputid.forEach(id=>
             {
-              domidtoselector =domidtoselector + "id =" + '"'+id+'"'+" or "
+              domidtoselector =domidtoselector + " or "+ "id =" + '"'+id+'"'
             })
-            domidtoselector = domidtoselector.substring(0,domidtoselector.length - 3)
-            console.log(domidtoselector)
             temitemquery = await this.sqlattrgetter(domidtoselector)
             console.log("temp",temitemquery)
-            //let flag = this.mergeflag
-            //if (flag == false){
-            //this.attrdata = temitemquery}
-            ///else{this.differpush(this.attrdata,temitemquery,"id")
-            //}
-            this.attrdata = temitemquery
+            let flag = this.mergeflag
+            if (flag == false){
+            this.attrdata = temitemquery}
+            else{this.differpush(this.attrdata,temitemquery,"id")
+            }
           },
         differpush: function(a,b,flag){
           let realflag = flag
@@ -839,6 +801,7 @@
       })
 
 </script>
+<<<<<<< HEAD
 <style>
         body .el-table th.gutter{
         display: table-cell!important;
@@ -848,4 +811,8 @@
         display: table-cell!important;
       }
 </style>
+=======
+<script>    
+</script>
+>>>>>>> parent of 707824c (改变界面，支持保存sql，支持保存表格字段配置)
 </html>
