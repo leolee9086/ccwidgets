@@ -124,13 +124,12 @@
             <el-main style = "margin:0%;padding: 0%;" >
             <el-table
             :data="scope.row.customattrarry"
-            style="margin:0%;padding: 0%;width: 100%"
+            style="margin:0%;padding: 0%;"
             :show-header= "false"
             empty-text="无自定义属性">
             <el-table-column
               label="属性名"
               prop="属性名"
-              width=250
               sortable>
               <template slot-scope="scope" >
                 <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize disabled>
@@ -140,7 +139,6 @@
             <el-table-column
             label="属性值"
             prop="属性值"
-            width=250
             sortable>
               <template slot-scope="scope" >
                 <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
@@ -152,7 +150,7 @@
             v-if="false"
             >
             </el-table-column>
-            <el-table-column fit >
+            <el-table-column fit width=50>
               <template slot-scope="scope" >
               <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'customattrarry')">-</el-button>
               </template>
@@ -160,13 +158,12 @@
             </el-table>
             <el-table
             :data="scope.row.tempcustomattrarry"
-            style="margin:0%;padding: 0%;width: 100%"
+            style="margin:0%;padding: 0%;"
             :show-header= "false"
             empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
             <el-table-column
               label="属性名"
               prop="属性名"
-              width=250
               sortable>
               <template slot-scope="scope" >
                 <el-form>
@@ -178,7 +175,6 @@
             <el-table-column
             label="属性值"
             prop="属性值"
-            width=250
             sortable>
               <template slot-scope="scope" >
                 <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
@@ -190,7 +186,7 @@
             v-if="false"
             >
             </el-table-column>
-            <el-table-column fit >
+            <el-table-column fit width=50 >
               <template slot-scope="scope" >
               <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'tempcustomattrarry')">-</el-button>
               </template>
