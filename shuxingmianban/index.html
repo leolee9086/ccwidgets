@@ -64,6 +64,12 @@
             inactive-text="界面选择模式"
             active-color="#13ce66"
             ></el-switch>
+            <el-switch  
+            v-model="iscustomattrshow"
+
+            active-text="折叠自定义属性"
+            active-color="#13ce66"
+            ></el-switch>
             <el-button size=small style="height: 100%;"  @click="drawer = true">开始配置</el-button>
           </el-col>
           <el-col>
@@ -102,7 +108,6 @@
         height="600"
         empty-text="我的推荐码是N2p37W6">
 
-        <el-table-column>
 
         <el-table-column
         width = 50
@@ -116,97 +121,7 @@
         </el-table-column>
 
         <!-- 此处需要重写自定义属性的获取方法 -->
-        <el-table-column
-        style="margin:0%;padding: 0%" type="expand" >
-        <template slot-scope="scope"  > 
-          <el-container
-          style = "margin:0%;padding: 0%;">
-            <el-main style = "margin:0%;padding: 0%;" >
-            <el-table
-            :data="scope.row.customattrarry"
-            style="margin:0%;padding: 0%;"
-            :show-header= "false"
-            empty-text="无自定义属性">
-            <el-table-column
-              label="属性名"
-              prop="属性名"
-              sortable>
-              <template slot-scope="scope" >
-                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize disabled>
-                </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-            label="属性值"
-            prop="属性值"
-            sortable>
-              <template slot-scope="scope" >
-                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
-                </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-            prop="id"
-            v-if="false"
-            >
-            </el-table-column>
-            <el-table-column fit width=50>
-              <template slot-scope="scope" >
-              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'customattrarry')">-</el-button>
-              </template>
-            </el-table-column>
-            </el-table>
-            <el-table
-            :data="scope.row.tempcustomattrarry"
-            style="margin:0%;padding: 0%;"
-            :show-header= "false"
-            empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
-            <el-table-column
-              label="属性名"
-              prop="属性名"
-              sortable>
-              <template slot-scope="scope" >
-                <el-form>
-                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
-                </el-input>
-                </el-form>
-              </template>
-            </el-table-column>
-            <el-table-column
-            label="属性值"
-            prop="属性值"
-            sortable>
-              <template slot-scope="scope" >
-                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
-                </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-            prop="id"
-            v-if="false"
-            >
-            </el-table-column>
-            <el-table-column fit width=50 >
-              <template slot-scope="scope" >
-              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'tempcustomattrarry')">-</el-button>
-              </template>
-            </el-table-column>
-            </el-table>
-          </el-main>
-            <el-footer>
-              <el-button
-              style = "width:30%" v-on:click="cusattrappender(scope.row.id,scope.row.tempcustomattrarry)">
-                添加
-              </el-button> 
-              <el-button
-              style = "width:30%" v-on:click="customsetters(scope.row.id)">
-                确定
-              </el-button> 
-            </el-footer>
-          </el-container>
-        </template>
-        </el-table-column>
-      </el-table-column>
+        
 
 
         <el-table-column
@@ -325,8 +240,189 @@
             <el-button  v-on:click="setters(scope.row,'memo',scope.row.memo)">提交</el-button>  
           </template>
         </el-table-column>
-
+        
+        <el-table-column class="zidingyishuxing"
+        label="自定义属性" style="margin:0%;padding: 0%"   width="600" v-if="iscustomattrshow">
+        <template slot-scope="scope"  > 
+          <el-container
+          style = "margin:0%;padding: 0%;">
+            <el-main style = "margin:0%;padding: 0%;" >
+            <el-table
+            :data="scope.row.customattrarry"
+            style="margin:0%;padding: 0%;"
+            :show-header= "false"
+            empty-text="无自定义属性">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize disabled>
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit width=50>
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'customattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+            <el-table
+            :data="scope.row.tempcustomattrarry"
+            style="margin:0%;padding: 0%;"
+            :show-header= "false"
+            empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              sortable>
+              <template slot-scope="scope" >
+                <el-form>
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
+                </el-input>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit width=50 >
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'tempcustomattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+          </el-main>
+            <el-footer>
+              <el-button
+              style = "width:30%" v-on:click="cusattrappender(scope.row.id,scope.row.tempcustomattrarry)">
+                添加
+              </el-button> 
+              <el-button
+              style = "width:30%" v-on:click="customsetters(scope.row.id)">
+                确定
+              </el-button> 
+            </el-footer>
+          </el-container>
+        </template>
+        </el-table-column>
       
+        <el-table-column
+         style="margin:0%;padding: 0%"    v-if="!iscustomattrshow" type="expand">
+        <template slot-scope="scope"  > 
+          <el-container
+          style = "margin:0%;padding: 0%;">
+            <el-main style = "margin:0%;padding: 0%;" >
+            <el-table
+            :data="scope.row.customattrarry"
+            style="margin:0%;padding: 0%;"
+            :show-header= "false"
+            empty-text="无自定义属性">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize disabled>
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit width=50>
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'customattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+            <el-table
+            :data="scope.row.tempcustomattrarry"
+            style="margin:0%;padding: 0%;"
+            :show-header= "false"
+            empty-text="点击右方-删除属性，点击下方+新增属性，空属性名与空属性值会被忽略">
+            <el-table-column
+              label="属性名"
+              prop="属性名"
+              sortable>
+              <template slot-scope="scope" >
+                <el-form>
+                <el-input size="mini"  v-model="scope.row.属性名" type="textarea" autosize >
+                </el-input>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column
+            label="属性值"
+            prop="属性值"
+            sortable>
+              <template slot-scope="scope" >
+                <el-input size="mini"  v-model="scope.row.属性值" type="textarea" autosize >
+                </el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+            prop="id"
+            v-if="false"
+            >
+            </el-table-column>
+            <el-table-column fit width=50 >
+              <template slot-scope="scope" >
+              <el-button size="small" v-on:click="customdeleter(scope.row.id,scope.row.属性名,'tempcustomattrarry')">-</el-button>
+              </template>
+            </el-table-column>
+            </el-table>
+          </el-main>
+            <el-footer>
+              <el-button
+              style = "width:30%" v-on:click="cusattrappender(scope.row.id,scope.row.tempcustomattrarry)">
+                添加
+              </el-button> 
+              <el-button
+              style = "width:30%" v-on:click="customsetters(scope.row.id)">
+                确定
+              </el-button> 
+            </el-footer>
+          </el-container>
+        </template>
+        </el-table-column>
+
       </el-table>
       </div>    
     </div> 
@@ -743,6 +839,13 @@
       })
 
 </script>
-<script>
-</script>
+<style>
+        body .el-table th.gutter{
+        display: table-cell!important;
+      }
+
+      body .el-table colgroup.gutter{
+        display: table-cell!important;
+      }
+</style>
 </html>
